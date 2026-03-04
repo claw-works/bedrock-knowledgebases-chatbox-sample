@@ -52,9 +52,13 @@ export default function ChatWindow() {
     setMessages((prev) => [...prev, assistantMsg]);
 
     try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+      if (apiKey) headers["x-api-key"] = apiKey;
+
       const res = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ query, sessionId }),
       });
 
