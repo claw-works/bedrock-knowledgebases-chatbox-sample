@@ -44,7 +44,7 @@ export async function* streamBedrockKBResponse(
       type: "KNOWLEDGE_BASE",
       knowledgeBaseConfiguration: {
         knowledgeBaseId: kbId,
-        modelArn: `arn:aws:bedrock:${process.env.AWS_REGION ?? "us-east-1"}::foundation-model/anthropic.claude-3-5-sonnet-20241022-v2:0`,
+        modelArn: "global.anthropic.claude-sonnet-4-6",
       },
     },
     ...(sessionId ? { sessionId } : {}),
