@@ -14,7 +14,8 @@
     "clear": "Clear",
     "emptyState": "Ask anything from the knowledge base",
     "error": "Something went wrong. Please try again.",
-    "sources": "Sources ({count})"
+    "sources": "Sources ({count})",
+    "thinking": "Thinking…"
   },
   "history": {
     "title": "History",

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
+import { AUTH_KEY } from "@/lib/auth";
 import { Message } from "./MessageBubble";
 
 export interface SessionSummary {
@@ -42,7 +43,10 @@ export default function HistorySidebar({
   const fetchSessions = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/sessions");
+      const apiKey = localStorage.getItem(AUTH_KEY);
+      const res = await fetch("/api/sessions", {
+        headers: apiKey ? { "x-api-key": apiKey } : {},
+      });
       if (res.ok) {
         const data = await res.json();
         setSessions(data.sessions ?? []);
@@ -57,7 +61,10 @@ export default function HistorySidebar({
   }, [isOpen, fetchSessions]);
 
   const handleSelect = async (sessionId: string) => {
-    const res = await fetch(`/api/session?sessionId=${sessionId}`);
+    const apiKey = localStorage.getItem(AUTH_KEY);
+    const res = await fetch(`/api/session?sessionId=${sessionId}`, {
+      headers: apiKey ? { "x-api-key": apiKey } : {},
+    });
     if (res.ok) {
       const data = await res.json();
       // Convert DynamoDB messages to Message[] format
@@ -75,9 +82,13 @@ export default function HistorySidebar({
 
   const handleDelete = async (e: React.MouseEvent, sessionId: string) => {
     e.stopPropagation();
+    const apiKey = localStorage.getItem(AUTH_KEY);
     await fetch("/api/session", {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(apiKey ? { "x-api-key": apiKey } : {}),
+      },
       body: JSON.stringify({ sessionId }),
     });
     setSessions((prev) => prev.filter((s) => s.sessionId !== sessionId));

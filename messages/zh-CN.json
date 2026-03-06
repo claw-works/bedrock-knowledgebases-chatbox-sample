@@ -14,7 +14,8 @@
     "clear": "清空",
     "emptyState": "向知识库提问吧",
     "error": "请求失败，请重试。",
-    "sources": "来源 ({count})"
+    "sources": "来源 ({count})",
+    "thinking": "思考中…"
   },
   "history": {
     "title": "历史对话",

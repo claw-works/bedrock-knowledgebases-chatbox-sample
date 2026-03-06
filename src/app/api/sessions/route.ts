@@ -1,3 +1,4 @@
+import { NextRequest } from "next/server";
 import { DynamoDBDocumentClient, ScanCommand } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
@@ -18,13 +19,20 @@ export interface SessionSummary {
  * Returns the 20 most recent sessions (by createdAt desc), each with a preview
  * of the first user message. No user isolation for now.
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
+  // API key auth (same pattern as /api/chat)
+  const apiKey = req.headers.get("x-api-key");
+  if (process.env.API_KEY && apiKey !== process.env.API_KEY) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const result = await docClient.send(
       new ScanCommand({
         TableName: TABLE,
-        // Only fetch the fields we need
         ProjectionExpression: "sessionId, createdAt, messages",
+        // TODO: replace with GSI on createdAt when user isolation is added
+        Limit: 200,
       })
     );
 

@@ -11,13 +11,11 @@ export interface ChatWindowProps {
   /** When set, loads this session's messages instead of starting a new one */
   externalSessionId?: string | null;
   externalMessages?: Message[];
-  onSessionStart?: (sessionId: string) => void;
 }
 
 export default function ChatWindow({
   externalSessionId,
   externalMessages,
-  onSessionStart,
 }: ChatWindowProps = {}) {
   const t = useTranslations("chat");
   const searchParams = useSearchParams();
@@ -29,6 +27,11 @@ export default function ChatWindow({
   const [sessionId, setSessionId] = useState<string>(() => uuidv4());
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Scroll to bottom on every new message
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   // Load session from history when externalSessionId changes
   useEffect(() => {
