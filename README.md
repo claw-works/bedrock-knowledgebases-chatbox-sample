@@ -4,6 +4,11 @@ A modern, production-ready chat UI built on [Amazon Bedrock Knowledge Base](http
 
 Features streaming responses (SSE), citation display, multi-turn conversation, and a fully serverless deployment on AWS.
 
+## Screenshot
+
+![UI Screenshot](./screenshot.png)
+
+
 ## Features
 
 - 🚀 **Streaming output** — typewriter effect via Server-Sent Events (SSE)
