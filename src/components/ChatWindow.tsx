@@ -134,7 +134,7 @@ export default function ChatWindow() {
       {/* Message list */}
       <div className="flex-1 overflow-y-auto py-4 space-y-4">
         {messages.length === 0 && (
-          <div className="text-center text-gray-400 mt-20">
+          <div className="text-center text-gray-400 dark:text-gray-600 mt-20">
             <p className="text-4xl mb-3">💬</p>
             <p className="text-lg">Ask anything from the knowledge base</p>
           </div>
@@ -146,7 +146,7 @@ export default function ChatWindow() {
       </div>
 
       {/* Input area */}
-      <div className="py-3 border-t border-gray-200">
+      <div className="py-3 border-t border-gray-200 dark:border-gray-800">
         <div className="flex items-end gap-2">
           <textarea
             ref={inputRef}
@@ -155,7 +155,7 @@ export default function ChatWindow() {
             onKeyDown={handleKeyDown}
             placeholder="Ask a question… (Enter to send, Shift+Enter for newline)"
             rows={2}
-            className="flex-1 resize-none rounded-xl border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            className="flex-1 resize-none rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
             disabled={isStreaming}
           />
           <div className="flex flex-col gap-2">
@@ -169,7 +169,7 @@ export default function ChatWindow() {
             <button
               onClick={clearSession}
               disabled={isStreaming}
-              className="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs hover:bg-gray-200 disabled:opacity-40 transition-colors"
+              className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-xl text-xs hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 transition-colors"
               title="Clear conversation"
             >
               Clear

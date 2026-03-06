@@ -21,7 +21,7 @@ export default function MessageBubble({ message }: { message: Message }) {
         className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm ${
           isUser
             ? "bg-blue-600 text-white"
-            : "bg-white border border-gray-200 text-gray-800"
+            : "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100"
         }`}
       >
         {isUser ? (
@@ -29,21 +29,21 @@ export default function MessageBubble({ message }: { message: Message }) {
         ) : (
           <>
             <div
-              className={`prose prose-sm max-w-none ${
+              className={`prose prose-sm dark:prose-invert max-w-none ${
                 message.isStreaming && !message.content ? "typing-cursor" : ""
               } ${message.isStreaming && message.content ? "typing-cursor" : ""}`}
             >
               {message.content ? (
                 <ReactMarkdown>{message.content}</ReactMarkdown>
               ) : (
-                <span className="text-gray-400 italic">Thinking…</span>
+                <span className="text-gray-400 dark:text-gray-500 italic">Thinking…</span>
               )}
             </div>
 
             {/* Citations */}
             {message.citations && message.citations.length > 0 && (
-              <div className="mt-3 pt-3 border-t border-gray-100">
-                <p className="text-xs text-gray-500 mb-2 font-medium">
+              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium">
                   Sources ({message.citations.length})
                 </p>
                 <div className="space-y-1">
