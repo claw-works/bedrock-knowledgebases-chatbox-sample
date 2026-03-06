@@ -2,11 +2,13 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import MessageBubble, { Message } from "./MessageBubble";
 import { getStoredApiKey } from "@/lib/auth";
 import { v4 as uuidv4 } from "uuid";
 
 export default function ChatWindow() {
+  const t = useTranslations("chat");
   const searchParams = useSearchParams();
   const kbId = searchParams.get("kb") ?? undefined; // ?kb=xxx overrides KNOWLEDGE_BASE_ID env var
 
@@ -111,7 +113,7 @@ export default function ChatWindow() {
       setMessages((prev) =>
         prev.map((m) =>
           m.id === assistantId
-            ? { ...m, content: "⚠️ Something went wrong. Please try again.", isStreaming: false }
+            ? { ...m, content: `⚠️ ${t("error")}`, isStreaming: false }
             : m
         )
       );
@@ -140,7 +142,7 @@ export default function ChatWindow() {
         {messages.length === 0 && (
           <div className="text-center text-gray-400 dark:text-gray-600 mt-20">
             <p className="text-4xl mb-3">💬</p>
-            <p className="text-lg">Ask anything from the knowledge base</p>
+            <p className="text-lg">{t("emptyState")}</p>
           </div>
         )}
         {messages.map((msg) => (
@@ -157,7 +159,7 @@ export default function ChatWindow() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask a question… (Enter to send, Shift+Enter for newline)"
+            placeholder={t("placeholder")}
             rows={2}
             className="flex-1 resize-none rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
             disabled={isStreaming}
@@ -168,15 +170,15 @@ export default function ChatWindow() {
               disabled={isStreaming || !input.trim()}
               className="px-4 py-3 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              {isStreaming ? "…" : "Send"}
+              {isStreaming ? t("sending") : t("send")}
             </button>
             <button
               onClick={clearSession}
               disabled={isStreaming}
               className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-xl text-xs hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-40 transition-colors"
-              title="Clear conversation"
+              title={t("clear")}
             >
-              Clear
+              {t("clear")}
             </button>
           </div>
         </div>

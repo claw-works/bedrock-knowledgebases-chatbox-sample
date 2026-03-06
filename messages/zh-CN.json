@@ -1,0 +1,29 @@
+{
+  "layout": {
+    "title": "知识库对话",
+    "subtitle": "由 Amazon Bedrock 驱动"
+  },
+  "header": {
+    "signOut": "退出登录"
+  },
+  "chat": {
+    "placeholder": "输入问题… （Enter 发送，Shift+Enter 换行）",
+    "send": "发送",
+    "sending": "…",
+    "clear": "清空",
+    "emptyState": "向知识库提问吧",
+    "error": "请求失败，请重试。",
+    "sources": "来源 ({count})",
+    "thinking": "思考中…"
+  },
+  "login": {
+    "title": "知识库对话",
+    "subtitle": "由 Amazon Bedrock 驱动",
+    "label": "API 密钥",
+    "placeholder": "请输入 API 密钥",
+    "submit": "登录",
+    "submitting": "验证中…",
+    "errorEmpty": "请输入 API 密钥。",
+    "errorInvalid": "API 密钥无效，请重试。"
+  }
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import ReactMarkdown from "react-markdown";
 import CitationCard, { Citation } from "./CitationCard";
 
@@ -13,6 +14,7 @@ export interface Message {
 }
 
 export default function MessageBubble({ message }: { message: Message }) {
+  const t = useTranslations("chat");
   const isUser = message.role === "user";
 
   return (
@@ -36,7 +38,7 @@ export default function MessageBubble({ message }: { message: Message }) {
               {message.content ? (
                 <ReactMarkdown>{message.content}</ReactMarkdown>
               ) : (
-                <span className="text-gray-400 dark:text-gray-500 italic">Thinking…</span>
+                <span className="text-gray-400 dark:text-gray-500 italic">{t("thinking")}</span>
               )}
             </div>
 
@@ -44,7 +46,7 @@ export default function MessageBubble({ message }: { message: Message }) {
             {message.citations && message.citations.length > 0 && (
               <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium">
-                  Sources ({message.citations.length})
+                  {t("sources", { count: message.citations.length })}
                 </p>
                 <div className="space-y-1">
                   {message.citations.map((c, i) => (
