@@ -1,0 +1,29 @@
+{
+  "layout": {
+    "title": "Knowledge Base Chat",
+    "subtitle": "Powered by Amazon Bedrock"
+  },
+  "header": {
+    "signOut": "Sign out"
+  },
+  "chat": {
+    "placeholder": "Ask a question… (Enter to send, Shift+Enter for newline)",
+    "send": "Send",
+    "sending": "…",
+    "clear": "Clear",
+    "emptyState": "Ask anything from the knowledge base",
+    "error": "Something went wrong. Please try again.",
+    "sources": "Sources ({count})",
+    "thinking": "Thinking…"
+  },
+  "login": {
+    "title": "Knowledge Base Chat",
+    "subtitle": "Powered by Amazon Bedrock",
+    "label": "API Key",
+    "placeholder": "Enter your API key",
+    "submit": "Sign in",
+    "submitting": "Verifying…",
+    "errorEmpty": "Please enter an API key.",
+    "errorInvalid": "Invalid API key. Please try again."
+  }
+}
