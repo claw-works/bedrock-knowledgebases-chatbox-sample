@@ -1,6 +1,7 @@
 import {
   DynamoDBClient,
   CreateTableCommand,
+  UpdateTimeToLiveCommand,
   ResourceInUseException,
 } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
@@ -50,6 +51,12 @@ export async function ensureTable(): Promise<void> {
           { AttributeName: "sessionId", AttributeType: "S" },
         ],
         BillingMode: "PAY_PER_REQUEST",
+      })
+    );
+    // Enable TTL separately — TimeToLiveSpecification is not part of CreateTableCommand
+    await ddbClient.send(
+      new UpdateTimeToLiveCommand({
+        TableName: TABLE,
         TimeToLiveSpecification: {
           AttributeName: "ttl",
           Enabled: true,

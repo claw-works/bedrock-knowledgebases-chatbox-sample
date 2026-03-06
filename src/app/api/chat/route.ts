@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { streamBedrockKBResponse } from "@/lib/bedrock";
-import { getSession, saveSession, ensureTable } from "@/lib/session";
+import { getSession, saveSession, ensureTable, Session } from "@/lib/session";
 import { v4 as uuidv4 } from "uuid";
 
 export const runtime = "nodejs";
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
 
   await ensureTable();
   const sessionId = incomingSessionId ?? uuidv4();
-  const session = (await getSession(sessionId)) ?? {
+  const session: Session = (await getSession(sessionId)) ?? {
     sessionId,
     messages: [],
     createdAt: Date.now(),
