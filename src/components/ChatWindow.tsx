@@ -7,10 +7,21 @@ import MessageBubble, { Message } from "./MessageBubble";
 import { getStoredApiKey } from "@/lib/auth";
 import { v4 as uuidv4 } from "uuid";
 
-export default function ChatWindow() {
+export interface ChatWindowProps {
+  /** When set, loads this session's messages instead of starting a new one */
+  externalSessionId?: string | null;
+  externalMessages?: Message[];
+  onSessionStart?: (sessionId: string) => void;
+}
+
+export default function ChatWindow({
+  externalSessionId,
+  externalMessages,
+  onSessionStart,
+}: ChatWindowProps = {}) {
   const t = useTranslations("chat");
   const searchParams = useSearchParams();
-  const kbId = searchParams.get("kb") ?? undefined; // ?kb=xxx overrides KNOWLEDGE_BASE_ID env var
+  const kbId = searchParams.get("kb") ?? undefined;
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -19,9 +30,13 @@ export default function ChatWindow() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  // Load session from history when externalSessionId changes
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (externalSessionId && externalMessages) {
+      setSessionId(externalSessionId);
+      setMessages(externalMessages);
+    }
+  }, [externalSessionId, externalMessages]);
 
   const clearSession = async () => {
     await fetch("/api/session", {
