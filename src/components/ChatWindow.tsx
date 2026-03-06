@@ -1,11 +1,15 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import MessageBubble, { Message } from "./MessageBubble";
 import { getStoredApiKey } from "@/lib/auth";
 import { v4 as uuidv4 } from "uuid";
 
 export default function ChatWindow() {
+  const searchParams = useSearchParams();
+  const kbId = searchParams.get("kb") ?? undefined; // ?kb=xxx overrides KNOWLEDGE_BASE_ID env var
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
@@ -60,7 +64,7 @@ export default function ChatWindow() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers,
-        body: JSON.stringify({ query, sessionId }),
+        body: JSON.stringify({ query, sessionId, kbId }),
       });
 
       if (!res.ok || !res.body) throw new Error("Request failed");

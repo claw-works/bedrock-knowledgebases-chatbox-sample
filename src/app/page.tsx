@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useRouter } from "next/navigation";
 import ChatWindow from "@/components/ChatWindow";
 import { clearStoredApiKey } from "@/lib/auth";
@@ -34,7 +35,10 @@ export default function Home() {
           </button>
         </div>
       </header>
-      <ChatWindow />
+      {/* Suspense required because ChatWindow uses useSearchParams() */}
+      <Suspense fallback={<div className="flex-1" />}>
+        <ChatWindow />
+      </Suspense>
     </main>
   );
 }
