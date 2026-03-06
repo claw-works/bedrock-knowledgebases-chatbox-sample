@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     return unauthorized();
   }
 
-  const { query, sessionId: incomingSessionId } = await req.json();
+  const { query, sessionId: incomingSessionId, kbId } = await req.json();
   if (!query?.trim()) {
     return new Response(JSON.stringify({ error: "query is required" }), {
       status: 400,
@@ -56,7 +56,8 @@ export async function POST(req: NextRequest) {
 
         for await (const chunk of streamBedrockKBResponse(
           query,
-          session.bedrockSessionId
+          session.bedrockSessionId,
+          kbId
         )) {
           if (chunk.type === "text") {
             assistantText += chunk.content ?? "";
