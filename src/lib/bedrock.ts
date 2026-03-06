@@ -83,8 +83,8 @@ export async function* streamBedrockKBResponse(
       }
     }
     // Capture sessionId from the stream
-    if ((event as Record<string, unknown>).sessionId) {
-      newSessionId = (event as Record<string, unknown>).sessionId as string;
+    if ((event as unknown as Record<string, unknown>).sessionId) {
+      newSessionId = (event as unknown as Record<string, unknown>).sessionId as string;
     }
   }
 
