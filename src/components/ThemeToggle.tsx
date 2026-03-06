@@ -11,6 +11,8 @@ export default function ThemeToggle() {
   useEffect(() => setMounted(true), []);
   if (!mounted) return <div className="w-8 h-8" />; // placeholder to prevent layout shift
 
+  // Use resolvedTheme instead of theme: when user picks "system", theme="system"
+  // but resolvedTheme already maps it to the actual "light" or "dark" value.
   const isDark = resolvedTheme === "dark";
 
   return (
