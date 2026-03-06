@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import MessageBubble, { Message } from "./MessageBubble";
+import { getStoredApiKey } from "@/lib/auth";
 import { v4 as uuidv4 } from "uuid";
 
 export default function ChatWindow() {
@@ -53,7 +54,7 @@ export default function ChatWindow() {
 
     try {
       const headers: Record<string, string> = { "Content-Type": "application/json" };
-      const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+      const apiKey = getStoredApiKey() ?? process.env.NEXT_PUBLIC_API_KEY;
       if (apiKey) headers["x-api-key"] = apiKey;
 
       const res = await fetch("/api/chat", {
