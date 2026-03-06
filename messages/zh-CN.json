@@ -4,7 +4,8 @@
     "subtitle": "由 Amazon Bedrock 驱动"
   },
   "header": {
-    "signOut": "退出登录"
+    "signOut": "退出登录",
+    "history": "历史对话"
   },
   "chat": {
     "placeholder": "输入问题… （Enter 发送，Shift+Enter 换行）",
@@ -15,6 +16,16 @@
     "error": "请求失败，请重试。",
     "sources": "来源 ({count})",
     "thinking": "思考中…"
+  },
+  "history": {
+    "title": "历史对话",
+    "empty": "暂无历史对话。",
+    "delete": "删除",
+    "newChat": "新对话",
+    "justNow": "刚刚",
+    "minutesAgo": "{n} 分钟前",
+    "hoursAgo": "{n} 小时前",
+    "daysAgo": "{n} 天前"
   },
   "login": {
     "title": "知识库对话",

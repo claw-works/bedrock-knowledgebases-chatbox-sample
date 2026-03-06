@@ -4,7 +4,8 @@
     "subtitle": "Powered by Amazon Bedrock"
   },
   "header": {
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "history": "History"
   },
   "chat": {
     "placeholder": "Ask a question… (Enter to send, Shift+Enter for newline)",
@@ -15,6 +16,16 @@
     "error": "Something went wrong. Please try again.",
     "sources": "Sources ({count})",
     "thinking": "Thinking…"
+  },
+  "history": {
+    "title": "History",
+    "empty": "No previous conversations.",
+    "delete": "Delete",
+    "newChat": "New chat",
+    "justNow": "Just now",
+    "minutesAgo": "{n}m ago",
+    "hoursAgo": "{n}h ago",
+    "daysAgo": "{n}d ago"
   },
   "login": {
     "title": "Knowledge Base Chat",
