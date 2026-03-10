@@ -11,15 +11,20 @@ export interface ChatWindowProps {
   /** When set, loads this session's messages instead of starting a new one */
   externalSessionId?: string | null;
   externalMessages?: Message[];
+  /** When set, associates sessions with this user ID */
+  userId?: string;
 }
 
 export default function ChatWindow({
   externalSessionId,
   externalMessages,
+  userId,
 }: ChatWindowProps = {}) {
   const t = useTranslations("chat");
   const searchParams = useSearchParams();
   const kbId = searchParams.get("kb") ?? undefined;
+  // userId from prop (parent) or URL param ?user=xxx
+  const resolvedUserId = userId ?? searchParams.get("user") ?? undefined;
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -84,7 +89,7 @@ export default function ChatWindow({
       const res = await fetch("/api/chat", {
         method: "POST",
         headers,
-        body: JSON.stringify({ query, sessionId, kbId }),
+        body: JSON.stringify({ query, sessionId, kbId, userId: resolvedUserId }),
       });
 
       if (!res.ok || !res.body) throw new Error("Request failed");

@@ -17,6 +17,8 @@ interface HistorySidebarProps {
   onSelectSession: (sessionId: string, messages: Message[]) => void;
   onNewChat: () => void;
   onClose: () => void;
+  /** When set, only shows sessions belonging to this user */
+  userId?: string;
 }
 
 function relativeTime(ts: number, t: ReturnType<typeof useTranslations>): string {
@@ -35,6 +37,7 @@ export default function HistorySidebar({
   onSelectSession,
   onNewChat,
   onClose,
+  userId,
 }: HistorySidebarProps) {
   const t = useTranslations();
   const [sessions, setSessions] = useState<SessionSummary[]>([]);
@@ -44,7 +47,10 @@ export default function HistorySidebar({
     setLoading(true);
     try {
       const apiKey = localStorage.getItem(AUTH_KEY);
-      const res = await fetch("/api/sessions", {
+      const url = userId
+        ? `/api/sessions?userId=${encodeURIComponent(userId)}`
+        : "/api/sessions";
+      const res = await fetch(url, {
         headers: apiKey ? { "x-api-key": apiKey } : {},
       });
       if (res.ok) {
@@ -54,7 +60,7 @@ export default function HistorySidebar({
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     if (isOpen) fetchSessions();

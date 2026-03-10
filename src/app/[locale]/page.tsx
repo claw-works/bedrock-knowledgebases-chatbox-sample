@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import ChatWindow from "@/components/ChatWindow";
 import HistorySidebar from "@/components/HistorySidebar";
@@ -11,9 +11,12 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { Message } from "@/components/MessageBubble";
 import { v4 as uuidv4 } from "uuid";
 
-export default function Home() {
+function HomeContent() {
   const router = useRouter();
   const t = useTranslations();
+  const searchParams = useSearchParams();
+  // ?user=xxx — opaque user ID injected by the parent app (e.g. via iframe URL)
+  const userId = searchParams.get("user") ?? undefined;
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
@@ -48,6 +51,7 @@ export default function Home() {
         onSelectSession={handleSelectSession}
         onNewChat={handleNewChat}
         onClose={() => setSidebarOpen(false)}
+        userId={userId}
       />
 
       {/* Main area */}
@@ -87,14 +91,21 @@ export default function Home() {
             </button>
           </div>
         </header>
-        {/* Suspense required because ChatWindow uses useSearchParams() */}
-        <Suspense fallback={<div className="flex-1" />}>
-          <ChatWindow
-            externalSessionId={activeSessionId}
-            externalMessages={activeMessages ?? undefined}
-          />
-        </Suspense>
+        <ChatWindow
+          externalSessionId={activeSessionId}
+          externalMessages={activeMessages ?? undefined}
+          userId={userId}
+        />
       </main>
     </div>
   );
 }
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div className="flex h-screen" />}>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
