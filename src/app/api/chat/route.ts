@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { streamBedrockKBResponse } from "@/lib/bedrock";
-import { getSession, saveSession, ensureTable, Session } from "@/lib/session";
+import { getSession, saveSession, ensureTable, ensureGSI, Session } from "@/lib/session";
 import { v4 as uuidv4 } from "uuid";
 
 export const runtime = "nodejs";
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     return unauthorized();
   }
 
-  const { query, sessionId: incomingSessionId, kbId } = await req.json();
+  const { query, sessionId: incomingSessionId, kbId, userId } = await req.json();
   if (!query?.trim()) {
     return new Response(JSON.stringify({ error: "query is required" }), {
       status: 400,
@@ -29,13 +29,19 @@ export async function POST(req: NextRequest) {
   }
 
   await ensureTable();
+  await ensureGSI().catch(console.warn);
+
   const sessionId = incomingSessionId ?? uuidv4();
   const session: Session = (await getSession(sessionId)) ?? {
     sessionId,
+    userId: userId ?? undefined,
     messages: [],
     createdAt: Date.now(),
     ttl: 0,
   };
+
+  // Backfill userId if not already set (e.g. session pre-existed before this feature)
+  if (userId && !session.userId) session.userId = userId;
 
   // Add user message
   session.messages.push({ role: "user", content: query, ts: Date.now() });
