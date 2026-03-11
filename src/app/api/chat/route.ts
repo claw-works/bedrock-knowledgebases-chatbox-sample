@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { streamBedrockKBResponse } from "@/lib/bedrock";
 import { getSession, saveSession, ensureTable, Session } from "@/lib/session";
+import { isAuthorized } from "@/lib/auth";
 import { v4 as uuidv4 } from "uuid";
 
 export const runtime = "nodejs";
@@ -14,9 +15,8 @@ function unauthorized() {
 }
 
 export async function POST(req: NextRequest) {
-  // Simple API key auth
-  const apiKey = req.headers.get("x-api-key");
-  if (process.env.API_KEY && apiKey !== process.env.API_KEY) {
+  // Auth: supports x-api-key and Authorization: Bearer
+  if (!isAuthorized(req.headers)) {
     return unauthorized();
   }
 

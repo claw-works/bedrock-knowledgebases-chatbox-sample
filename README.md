@@ -125,3 +125,75 @@ PRs welcome. This project targets submission to [aws-samples](https://github.com
 ## License
 
 Apache 2.0 — see [LICENSE](LICENSE)
+## OpenAI Compatible API
+
+The server exposes an OpenAI-compatible API so you can use it with Open WebUI, AnythingLLM, or any OpenAI SDK client.
+
+### Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/v1/models` | List available models |
+| POST | `/v1/chat/completions` | Chat completions (stream & non-stream) |
+
+### Authentication
+
+Both `x-api-key` header and `Authorization: Bearer <token>` are supported.
+
+### Usage with OpenAI Python SDK
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://your-deployment.vercel.app",  # or http://localhost:3000
+    api_key="your-api-key",                          # matches API_KEY env var
+)
+
+# Non-streaming
+response = client.chat.completions.create(
+    model="bedrock-kb",
+    messages=[{"role": "user", "content": "What is Amazon Bedrock?"}],
+)
+print(response.choices[0].message.content)
+
+# Streaming
+stream = client.chat.completions.create(
+    model="bedrock-kb",
+    messages=[{"role": "user", "content": "Explain RAG in simple terms"}],
+    stream=True,
+)
+for chunk in stream:
+    print(chunk.choices[0].delta.content or "", end="", flush=True)
+```
+
+### Multi-turn Conversations
+
+Pass `bedrock_session_id` from a previous response back as `session_id` in the request body to maintain conversation context:
+
+```python
+import httpx, json
+
+resp = httpx.post(
+    "https://your-deployment.vercel.app/v1/chat/completions",
+    headers={"Authorization": "Bearer your-api-key"},
+    json={"model": "bedrock-kb", "messages": [{"role": "user", "content": "Hello"}]},
+)
+data = resp.json()
+session_id = data.get("bedrock_session_id")
+
+# Continue the conversation
+resp2 = httpx.post(
+    "https://your-deployment.vercel.app/v1/chat/completions",
+    headers={"Authorization": "Bearer your-api-key"},
+    json={
+        "model": "bedrock-kb",
+        "messages": [{"role": "user", "content": "Tell me more"}],
+        "session_id": session_id,
+    },
+)
+```
+
+### Open WebUI / AnythingLLM
+
+Set the **OpenAI API base URL** to your deployment URL and use `bedrock-kb` as the model name.

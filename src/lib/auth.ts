@@ -28,3 +28,34 @@ export async function validateApiKey(key: string): Promise<boolean> {
     return false;
   }
 }
+
+/**
+ * Server-side: extract API key from request headers.
+ * Supports both:
+ *   - x-api-key: <key>
+ *   - Authorization: Bearer <key>
+ */
+export function extractApiKey(headers: Headers): string | null {
+  // x-api-key takes precedence
+  const xApiKey = headers.get("x-api-key");
+  if (xApiKey) return xApiKey;
+
+  // Authorization: Bearer <token>
+  const auth = headers.get("authorization");
+  if (auth?.toLowerCase().startsWith("bearer ")) {
+    return auth.slice(7).trim();
+  }
+
+  return null;
+}
+
+/**
+ * Server-side: validate a request's API key against the configured API_KEY env var.
+ * Returns true if auth passes (no key configured = always pass).
+ */
+export function isAuthorized(headers: Headers): boolean {
+  const expected = process.env.API_KEY;
+  if (!expected) return true; // no key configured, open access
+  const provided = extractApiKey(headers);
+  return provided === expected;
+}
