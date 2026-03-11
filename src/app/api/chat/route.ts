@@ -1,5 +1,10 @@
 import { NextRequest } from "next/server";
-import { streamBedrockKBResponse } from "@/lib/bedrock";
+import {
+  streamBedrockKBResponse,
+  retrieveBedrockKB,
+  generateWithOpenAIStream,
+  isTwoStepRagConfigured,
+} from "@/lib/bedrock";
 import { getSession, saveSession, ensureTable, Session } from "@/lib/session";
 import { isAuthorized } from "@/lib/auth";
 import { v4 as uuidv4 } from "uuid";
@@ -54,11 +59,15 @@ export async function POST(req: NextRequest) {
           )
         );
 
-        for await (const chunk of streamBedrockKBResponse(
-          query,
-          session.bedrockSessionId,
-          kbId || undefined   // URL param override; falls back to KNOWLEDGE_BASE_ID env var
-        )) {
+        // Choose RAG strategy
+        const chunkGenerator = isTwoStepRagConfigured()
+          ? (async function* () {
+              const chunks = await retrieveBedrockKB(query, kbId || undefined);
+              yield* generateWithOpenAIStream(query, chunks);
+            })()
+          : streamBedrockKBResponse(query, session.bedrockSessionId, kbId || undefined);
+
+        for await (const chunk of chunkGenerator) {
           if (chunk.type === "text") {
             assistantText += chunk.content ?? "";
             controller.enqueue(

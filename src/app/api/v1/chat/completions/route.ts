@@ -1,6 +1,13 @@
 import { NextRequest } from "next/server";
 import { isAuthorized } from "@/lib/auth";
-import { streamBedrockKBResponse, invokeBedrockKBResponse } from "@/lib/bedrock";
+import {
+  streamBedrockKBResponse,
+  invokeBedrockKBResponse,
+  retrieveBedrockKB,
+  generateWithOpenAIStream,
+  generateWithOpenAI,
+  isTwoStepRagConfigured,
+} from "@/lib/bedrock";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -81,7 +88,14 @@ export async function POST(req: NextRequest) {
         try {
           let fullText = "";
 
-          for await (const chunk of streamBedrockKBResponse(query, session_id, knowledge_base_id)) {
+          const chunkGen = isTwoStepRagConfigured()
+            ? (async function* () {
+                const chunks = await retrieveBedrockKB(query, knowledge_base_id);
+                yield* generateWithOpenAIStream(query, chunks);
+              })()
+            : streamBedrockKBResponse(query, session_id, knowledge_base_id);
+
+          for await (const chunk of chunkGen) {
             if (chunk.type === "error") {
               send({
                 id: completionId,
@@ -141,11 +155,17 @@ export async function POST(req: NextRequest) {
   } else {
     // === Non-streaming response ===
     try {
-      const { text, sessionId: newSessionId } = await invokeBedrockKBResponse(
-        query,
-        session_id,
-        knowledge_base_id
-      );
+      let text: string;
+      let newSessionId: string | undefined;
+
+      if (isTwoStepRagConfigured()) {
+        const chunks = await retrieveBedrockKB(query, knowledge_base_id);
+        text = await generateWithOpenAI(query, chunks);
+      } else {
+        const result = await invokeBedrockKBResponse(query, session_id, knowledge_base_id);
+        text = result.text;
+        newSessionId = result.sessionId;
+      }
 
       return Response.json({
         id: completionId,

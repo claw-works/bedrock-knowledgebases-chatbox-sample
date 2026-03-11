@@ -197,3 +197,20 @@ resp2 = httpx.post(
 ### Open WebUI / AnythingLLM
 
 Set the **OpenAI API base URL** to your deployment URL and use `bedrock-kb` as the model name.
+
+## Two-Step RAG (Retrieve + OpenAI Generate)
+
+By default the app uses Bedrock's `RetrieveAndGenerate` API (single call). You can switch to a two-step pipeline where Bedrock only handles retrieval and a separate OpenAI-compatible model does generation:
+
+```env
+# Optional — enable two-step RAG
+OPENAI_BASE_URL=https://api.openai.com    # or any OpenAI-compatible endpoint
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=gpt-4o-mini                  # default: gpt-4o-mini
+```
+
+When these variables are set:
+1. **Retrieve** — `POST /retrieve` to Bedrock KB → get top-N document chunks
+2. **Generate** — call your configured OpenAI endpoint with the chunks as context
+
+When not set, the original `RetrieveAndGenerate` flow is used as fallback.
