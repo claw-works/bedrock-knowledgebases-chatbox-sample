@@ -83,6 +83,27 @@ Open [http://localhost:3000](http://localhost:3000).
 > **Note:** `API_KEY` / `NEXT_PUBLIC_API_KEY` are optional. If unset, the API accepts all requests.  
 > For production, replace with Amazon Cognito or another auth layer.
 
+### URL Parameters (Intranet Mode)
+
+> ⚠️ **This mode is designed for intranet / internal use only.** No authentication is required when `API_KEY` is not configured. Do NOT expose to the public internet without adding a proper auth layer.
+
+When `API_KEY` is not set, the app skips the login page and enters open-access mode. You can pass Knowledge Base and user info via URL parameters:
+
+```
+http://localhost:3000/?kb=AWS文档库&kbId=ABCDEFGH12&user=Alice&userId=550e8400-e29b
+```
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `kbId`    | Yes      | Bedrock Knowledge Base ID, passed to the API |
+| `userId`  | Yes      | User ID for session isolation |
+| `kb`      | No       | Display name for the Knowledge Base (shown in header) |
+| `user`    | No       | Display name for the user (shown in header) |
+
+- `kbId` overrides the `KNOWLEDGE_BASE_ID` env var when provided.
+- `kb` and `user` are display-only — they do not affect API calls.
+- Different `userId` values get independent conversation histories.
+
 ### Model
 
 This sample uses `global.anthropic.claude-sonnet-4-6` (cross-region inference profile).  

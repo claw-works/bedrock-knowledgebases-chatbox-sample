@@ -3,6 +3,7 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Brain } from "lucide-react";
 import { validateApiKey, setStoredApiKey } from "@/lib/auth";
 
 export default function LoginPage() {
@@ -35,20 +36,22 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 px-4">
-      <div className="w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl shadow-md p-8">
-        {/* Logo / title */}
+    <main className="min-h-screen flex items-center justify-center bg-kb-bg-primary px-4">
+      <div className="w-full max-w-sm bg-kb-bg-secondary rounded-2xl border border-kb-border p-8">
+        {/* Logo */}
         <div className="text-center mb-6">
-          <p className="text-4xl mb-2">💬</p>
-          <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-100">{t("title")}</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t("subtitle")}</p>
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-50 mb-3">
+            <Brain className="w-6 h-6 text-kb-accent" />
+          </div>
+          <h1 className="text-xl font-semibold text-kb-text-primary">{t("title")}</h1>
+          <p className="text-sm text-kb-text-muted mt-1">{t("subtitle")}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label
               htmlFor="api-key"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              className="block text-sm font-medium text-kb-text-secondary mb-1"
             >
               {t("label")}
             </label>
@@ -60,12 +63,12 @@ export default function LoginPage() {
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
               disabled={loading}
-              className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              className="w-full rounded-lg border border-kb-border bg-kb-bg-input text-kb-text-primary placeholder-kb-text-muted px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-kb-accent disabled:opacity-50"
             />
           </div>
 
           {error && (
-            <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-lg px-3 py-2">
+            <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2 border border-red-200">
               {error}
             </p>
           )}
@@ -73,7 +76,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading || !apiKey.trim()}
-            className="w-full py-2.5 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="w-full py-2.5 bg-kb-accent text-kb-white rounded-lg text-sm font-medium hover:bg-kb-accent-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? t("submitting") : t("submit")}
           </button>

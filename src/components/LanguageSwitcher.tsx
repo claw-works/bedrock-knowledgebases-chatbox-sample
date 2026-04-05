@@ -31,7 +31,7 @@ export default function LanguageSwitcher() {
       disabled={isPending}
       title="Switch language / 切换语言"
       aria-label="Toggle language"
-      className="w-8 h-8 flex items-center justify-center rounded-lg text-xs font-semibold text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+      className="w-8 h-8 flex items-center justify-center rounded-lg text-xs font-semibold text-kb-text-muted hover:text-kb-text-primary hover:bg-kb-bg-input transition-colors disabled:opacity-50"
     >
       {LABELS[locale] ?? locale}
     </button>

@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     return unauthorized();
   }
 
-  const { query, sessionId: incomingSessionId, kbId } = await req.json();
+  const { query, sessionId: incomingSessionId, kbId, userId } = await req.json();
   if (!query?.trim()) {
     return new Response(JSON.stringify({ error: "query is required" }), {
       status: 400,
@@ -37,6 +37,7 @@ export async function POST(req: NextRequest) {
   const sessionId = incomingSessionId ?? uuidv4();
   const session: Session = (await getSession(sessionId)) ?? {
     sessionId,
+    userId,
     messages: [],
     createdAt: Date.now(),
     ttl: 0,
