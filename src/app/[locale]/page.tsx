@@ -3,7 +3,7 @@
 import { Suspense, useState, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Database, Settings } from "lucide-react";
+import { Database } from "lucide-react";
 import ChatWindow from "@/components/ChatWindow";
 import HistorySidebar from "@/components/HistorySidebar";
 import { clearStoredApiKey } from "@/lib/auth";
@@ -38,10 +38,6 @@ function HomeContent() {
     setNewSession(null);
   }, [userId]);
 
-  const handleLogout = () => {
-    clearStoredApiKey();
-    router.replace("/login");
-  };
 
   const handleSelectSession = useCallback(
     (sessionId: string, messages: Message[]) => {
@@ -115,13 +111,7 @@ function HomeContent() {
                 {userLabel}
               </span>
             )}
-            <button
-              onClick={handleLogout}
-              className="p-2 rounded-lg border border-kb-border text-kb-text-secondary hover:bg-kb-bg-input transition-colors"
-              title="Settings"
-            >
-              <Settings className="w-4 h-4" />
-            </button>
+
           </div>
         </header>
 

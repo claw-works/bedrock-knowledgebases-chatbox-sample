@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { Brain, Plus, Search, MessageSquare } from "lucide-react";
+import { Plus, Search, MessageSquare } from "lucide-react";
 import { AUTH_KEY } from "@/lib/auth";
 import { Message } from "./MessageBubble";
 
@@ -140,7 +140,6 @@ export default function HistorySidebar({
         {/* Header: Logo + New Chat */}
         <div className="flex items-center justify-between px-4 pt-6 pb-0">
           <div className="flex items-center gap-2.5">
-            <Brain className="w-6 h-6 text-kb-accent" />
             <span className="text-lg font-bold text-kb-text-primary">Bedrock KB</span>
           </div>
           <button
