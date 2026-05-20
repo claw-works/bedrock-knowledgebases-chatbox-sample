@@ -17,7 +17,7 @@ Features streaming responses (SSE), citation display, multi-turn conversation, a
 
 - 🚀 **Streaming output** — typewriter effect via Server-Sent Events (SSE)
 - 📚 **Citation display** — collapsible source cards from Bedrock KB citations
-- 💬 **Multi-turn conversation** — session management with DynamoDB
+- 💬 **Multi-turn conversation** — session management with PostgreSQL
 - 🔐 **API Key auth** — simple header-based auth, swap-in Cognito for production
 - 📱 **Responsive UI** — mobile-friendly chat interface built with Tailwind CSS
 - ☁️ **Serverless deployment** — CDK: CloudFront + S3 + API Gateway + Lambda
@@ -34,7 +34,7 @@ Next.js API Routes
 Bedrock Knowledge Base  ──→  Claude (RetrieveAndGenerate)
   │
   ▼
-DynamoDB (session store)
+PostgreSQL (session store)
 ```
 
 ## Quick Start
@@ -43,11 +43,11 @@ DynamoDB (session store)
 
 - Node.js 20+
 - AWS credentials configured (IAM role or `~/.aws/credentials`)
+- A PostgreSQL database (local or managed, e.g. Amazon RDS)
 - An existing [Bedrock Knowledge Base](https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base-create.html)
 - Required IAM permissions:
   - `bedrock:RetrieveAndGenerate`, `bedrock:Retrieve`
   - `bedrock:GetInferenceProfile`, `bedrock:InvokeModel`
-  - `dynamodb:GetItem`, `dynamodb:PutItem`, `dynamodb:CreateTable`
 
 ### Local Development
 
@@ -59,9 +59,9 @@ npm install
 cat > .env.local << 'EOF'
 KNOWLEDGE_BASE_ID=your-kb-id
 AWS_REGION=us-east-1
+DATABASE_URL=postgresql://user:password@localhost:5432/bedrock_kb
 API_KEY=your-secret-key
 NEXT_PUBLIC_API_KEY=your-secret-key
-DYNAMODB_TABLE=bedrock-kb-chatbox-sessions
 EOF
 
 # Run dev server
@@ -76,9 +76,13 @@ Open [http://localhost:3000](http://localhost:3000).
 |----------|-------|-------------|
 | `KNOWLEDGE_BASE_ID` | Server | Your Bedrock Knowledge Base ID |
 | `AWS_REGION` | Server | AWS region (e.g. `us-east-1`) |
+| `DATABASE_URL` | Server | PostgreSQL connection string (tables auto-created on first request) |
 | `API_KEY` | Server | Secret key checked on incoming requests |
-| `NEXT_PUBLIC_API_KEY` | Client | Same value as `API_KEY` — sent in `x-api-key` header by the browser |
-| `DYNAMODB_TABLE` | Server | DynamoDB table name for sessions (auto-created on first request) |
+| `NEXT_PUBLIC_API_KEY` | Client | Same value as `API_KEY` — used as fallback when no key stored in browser |
+| `BEDROCK_MODEL_ARN` | Server | Override default model (default: `global.anthropic.claude-sonnet-4-6`) |
+| `OPENAI_BASE_URL` | Server | Optional — enable two-step RAG with external LLM |
+| `OPENAI_API_KEY` | Server | Optional — API key for the external LLM |
+| `OPENAI_MODEL` | Server | Optional — model name for external LLM (default: `gpt-4o-mini`) |
 
 > **Note:** `API_KEY` / `NEXT_PUBLIC_API_KEY` are optional. If unset, the API accepts all requests.  
 > For production, replace with Amazon Cognito or another auth layer.
@@ -106,8 +110,8 @@ http://localhost:3000/?kb=AWS文档库&kbId=ABCDEFGH12&user=Alice&userId=550e840
 
 ### Model
 
-This sample uses `global.anthropic.claude-sonnet-4-6` (cross-region inference profile).  
-Update `modelArn` in `src/lib/bedrock.ts` to use a different model.
+Default model: `global.anthropic.claude-sonnet-4-6` (cross-region inference profile).  
+Override via `BEDROCK_MODEL_ARN` env var or edit `src/lib/bedrock.ts`.
 
 ### Deploy to AWS
 
@@ -122,30 +126,25 @@ npx cdk deploy
 ```
 ├── src/
 │   ├── app/
-│   │   ├── page.tsx               # Root page
+│   │   ├── [locale]/page.tsx      # Main chat page
 │   │   └── api/
 │   │       ├── chat/route.ts      # SSE streaming endpoint
-│   │       └── session/route.ts   # Session management
+│   │       ├── session/route.ts   # Session management
+│   │       └── sessions/route.ts  # Session list
 │   ├── components/
 │   │   ├── ChatWindow.tsx         # Main chat UI
 │   │   ├── MessageBubble.tsx      # User / assistant bubbles
 │   │   └── CitationCard.tsx       # Collapsible citation cards
 │   └── lib/
 │       ├── bedrock.ts             # Bedrock KB streaming client
-│       └── session.ts             # DynamoDB session store
-├── cdk/                           # CDK infrastructure (coming soon)
+│       └── session.ts             # PostgreSQL session store
+├── cdk/                           # CDK infrastructure
+├── .github/workflows/build.yml    # CI: build on version tag
 ├── postcss.config.js
 ├── tailwind.config.js
 └── next.config.mjs
 ```
 
-## Contributing
-
-PRs welcome. This project targets submission to [aws-samples](https://github.com/aws-samples).
-
-## License
-
-Apache 2.0 — see [LICENSE](LICENSE)
 ## OpenAI Compatible API
 
 The server exposes an OpenAI-compatible API so you can use it with Open WebUI, AnythingLLM, or any OpenAI SDK client.
@@ -231,7 +230,15 @@ OPENAI_MODEL=gpt-4o-mini                  # default: gpt-4o-mini
 ```
 
 When these variables are set:
-1. **Retrieve** — `POST /retrieve` to Bedrock KB → get top-N document chunks
+1. **Retrieve** — Bedrock KB retrieves top-N document chunks
 2. **Generate** — call your configured OpenAI endpoint with the chunks as context
 
 When not set, the original `RetrieveAndGenerate` flow is used as fallback.
+
+## Contributing
+
+PRs welcome. This project targets submission to [aws-samples](https://github.com/aws-samples).
+
+## License
+
+Apache 2.0 — see [LICENSE](LICENSE)
