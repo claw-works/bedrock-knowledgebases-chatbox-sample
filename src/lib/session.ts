@@ -1,8 +1,15 @@
 import { Pool } from "pg";
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+let pool: Pool | null = null;
+
+function getPool(): Pool {
+  if (!pool) {
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+    });
+  }
+  return pool;
+}
 
 export interface Session {
   sessionId: string;
@@ -14,7 +21,7 @@ export interface Session {
 }
 
 export async function ensureTable(): Promise<void> {
-  await pool.query(`
+  await getPool().query(`
     CREATE TABLE IF NOT EXISTS sessions (
       session_id         TEXT PRIMARY KEY,
       user_id            TEXT,
@@ -25,20 +32,20 @@ export async function ensureTable(): Promise<void> {
     )
   `);
   // Add user_id column if upgrading from old schema
-  await pool.query(`
+  await getPool().query(`
     DO $$ BEGIN
       ALTER TABLE sessions ADD COLUMN IF NOT EXISTS user_id TEXT;
     EXCEPTION WHEN duplicate_column THEN NULL;
     END $$
   `);
   // Index for listing by user
-  await pool.query(`
+  await getPool().query(`
     CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions (user_id, created_at DESC)
   `);
 }
 
 export async function getSession(sessionId: string): Promise<Session | null> {
-  const { rows } = await pool.query(
+  const { rows } = await getPool().query(
     `SELECT session_id, user_id, bedrock_session_id, messages, created_at FROM sessions WHERE session_id = $1`,
     [sessionId]
   );
@@ -55,7 +62,7 @@ export async function getSession(sessionId: string): Promise<Session | null> {
 }
 
 export async function saveSession(session: Session): Promise<void> {
-  await pool.query(
+  await getPool().query(
     `INSERT INTO sessions (session_id, user_id, bedrock_session_id, messages, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6)
      ON CONFLICT (session_id) DO UPDATE SET
@@ -74,20 +81,20 @@ export async function saveSession(session: Session): Promise<void> {
 }
 
 export async function deleteSession(sessionId: string): Promise<void> {
-  await pool.query(`DELETE FROM sessions WHERE session_id = $1`, [sessionId]);
+  await getPool().query(`DELETE FROM sessions WHERE session_id = $1`, [sessionId]);
 }
 
 export async function listSessions(userId?: string, limit = 20): Promise<
   Array<{ sessionId: string; createdAt: number; preview: string }>
 > {
   const { rows } = userId
-    ? await pool.query(
+    ? await getPool().query(
         `SELECT session_id, created_at, messages FROM sessions
          WHERE user_id = $1 AND jsonb_array_length(messages) > 0
          ORDER BY created_at DESC LIMIT $2`,
         [userId, limit]
       )
-    : await pool.query(
+    : await getPool().query(
         `SELECT session_id, created_at, messages FROM sessions
          WHERE jsonb_array_length(messages) > 0
          ORDER BY created_at DESC LIMIT $1`,
