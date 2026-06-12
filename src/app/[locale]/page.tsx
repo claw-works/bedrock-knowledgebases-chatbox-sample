@@ -23,7 +23,7 @@ function HomeContent() {
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [activeMessages, setActiveMessages] = useState<Message[] | null>(null);
   const [chatTitle, setChatTitle] = useState("New Chat");
-  const [modelName, setModelName] = useState("");
+  const [, setModelName] = useState("");
   const [newSession, setNewSession] = useState<{ sessionId: string; preview: string } | null>(null);
 
   useEffect(() => {
@@ -92,12 +92,6 @@ function HomeContent() {
               </svg>
             </button>
             <h1 className="text-base font-semibold text-kb-text-primary">{chatTitle}</h1>
-            {modelName && (
-              <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-50">
-                <div className="w-1.5 h-1.5 rounded-full bg-kb-success" />
-                <span className="text-[11px] font-medium text-kb-accent">{modelName}</span>
-              </div>
-            )}
           </div>
           <div className="flex items-center gap-2">
             {kbLabel && (

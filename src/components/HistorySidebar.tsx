@@ -45,6 +45,7 @@ export default function HistorySidebar({
   const t = useTranslations();
   const [sessions, setSessions] = useState<SessionSummary[]>([]);
   const [loading, setLoading] = useState(false);
+  const [filterText, setFilterText] = useState("");
 
   const fetchSessions = useCallback(async () => {
     setLoading(true);
@@ -154,7 +155,16 @@ export default function HistorySidebar({
         <div className="px-4 pt-4">
           <div className="flex items-center gap-2 h-10 px-3 rounded-lg bg-kb-bg-input border border-kb-border">
             <Search className="w-4 h-4 text-kb-text-muted shrink-0" />
-            <span className="text-[13px] text-kb-text-muted">Search conversations...</span>
+            <input
+              type="text"
+              value={filterText}
+              onChange={(e) => setFilterText(e.target.value)}
+              placeholder="Search conversations..."
+              className="flex-1 bg-transparent text-[13px] text-kb-text-primary placeholder-kb-text-muted focus:outline-none"
+            />
+            {filterText && (
+              <button onClick={() => setFilterText("")} className="text-kb-text-muted hover:text-kb-text-primary text-xs">✕</button>
+            )}
           </div>
         </div>
 
@@ -180,7 +190,9 @@ export default function HistorySidebar({
                 {t("history.empty")}
               </p>
             ) : (
-              sessions.map((s) => (
+              sessions
+              .filter((s) => !filterText || s.preview.toLowerCase().includes(filterText.toLowerCase()))
+              .map((s) => (
                 <div
                   key={s.sessionId}
                   onClick={() => handleSelect(s.sessionId)}
